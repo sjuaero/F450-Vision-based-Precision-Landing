@@ -1,0 +1,97 @@
+# Agricultural Mission System Configuration
+# Loaded by mission_manager and rover_controller
+
+field_zones:
+  A:
+    name: "North Field Zone A"
+    local_frame:
+      x: 50.0
+      y: 80.0
+      yaw: 0.0
+    dimensions:
+      width: 50.0    # meters E-W
+      length: 80.0   # meters N-S
+    spray_params:
+      altitude: 3.0      # meters AGL
+      speed: 2.0         # m/s
+      spray_width: 4.0   # effective swath per pass
+      overlap: 0.20      # 20% strip overlap
+
+  B:
+    name: "East Field Zone B"
+    local_frame:
+      x: 120.0
+      y: 50.0
+      yaw: 0.0
+    dimensions:
+      width: 60.0
+      length: 70.0
+    spray_params:
+      altitude: 3.0
+      speed: 2.0
+      spray_width: 4.0
+      overlap: 0.20
+
+  C:
+    name: "South Field Zone C"
+    local_frame:
+      x: 50.0
+      y: -60.0
+      yaw: 0.0
+    dimensions:
+      width: 55.0
+      length: 75.0
+    spray_params:
+      altitude: 3.0
+      speed: 2.0
+      spray_width: 4.0
+      overlap: 0.20
+
+  D:
+    name: "West Field Zone D"
+    local_frame:
+      x: -70.0
+      y: 40.0
+      yaw: 0.0
+    dimensions:
+      width: 45.0
+      length: 80.0
+    spray_params:
+      altitude: 3.0
+      speed: 2.0
+      spray_width: 4.0
+      overlap: 0.20
+
+base:
+  name: "Shed Base"
+  local_frame:
+    x: 0.0
+    y: 0.0
+    yaw: 3.14159  # Face outward (south)
+
+aruco:
+  marker_id: 42
+  marker_size_m: 0.5
+  dictionary: "DICT_4X4_50"
+  camera_topic: "/drone/camera/image_raw"
+  camera_info_topic: "/drone/camera/camera_info"
+  publish_debug_image: true
+
+drone:
+  takeoff_altitude: 5.0
+  spray_altitude: 3.0
+  max_velocity: 3.0
+  aruco_kp_xy: 0.4
+  aruco_kd_xy: 0.05
+  descent_rate: 0.3
+  low_battery_threshold: 0.25
+
+rover:
+  navigation_timeout_s: 120.0
+  goal_tolerance_m: 0.5
+
+llm:
+  model: "claude-opus-4-6"
+  max_tokens: 512
+  api_key_env: "ANTHROPIC_API_KEY"
+  min_confidence_threshold: 0.6

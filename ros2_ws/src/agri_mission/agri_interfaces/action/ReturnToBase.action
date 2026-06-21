@@ -1,0 +1,8 @@
+geometry_msgs/PoseStamped target_pose
+bool use_aruco_landing
+---
+bool success
+bool aruco_landing_used
+---
+float32 distance_remaining
+string landing_phase

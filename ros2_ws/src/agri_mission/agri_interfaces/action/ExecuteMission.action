@@ -1,0 +1,9 @@
+string command_text
+---
+bool success
+string final_state
+string error_message
+---
+string current_state
+float32 progress
+string status_message

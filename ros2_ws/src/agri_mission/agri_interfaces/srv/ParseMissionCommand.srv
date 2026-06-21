@@ -1,0 +1,12 @@
+string command_text
+string language_hint
+---
+bool success
+string zone_id
+string action
+float32 confidence
+string explanation
+float32 spray_height_m
+float32 overlap_percent
+float32 speed_ms
+string error_message

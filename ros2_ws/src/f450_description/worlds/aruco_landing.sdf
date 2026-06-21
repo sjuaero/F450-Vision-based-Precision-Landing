@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <world name="aruco_landing">
+
+    <physics name="4ms" type="ignored">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system"
+            name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system"
+            name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system"
+            name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-imu-system"
+            name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim-contact-system"
+            name="gz::sim::systems::Contact"/>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.5 0.5 0.5 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- ── 흙 운동장 (대형 지면, 60x60m) ───────────── -->
+    <include>
+      <uri>model://dirt_ground</uri>
+      <name>dirt_ground</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+
+    <!-- ── 중앙 착륙 패드 (1m x 1m, 빨간 배경 + ArUco 4마커) ── -->
+    <include>
+      <uri>model://landing_pad_charuco</uri>
+      <name>landing_pad</name>
+      <!-- 지면(z=0) 바로 위에 살짝 띄워 배치 -->
+      <pose>0 0 0.006 0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>

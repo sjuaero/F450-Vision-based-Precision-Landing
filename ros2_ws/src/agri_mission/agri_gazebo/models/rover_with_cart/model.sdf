@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!--
+  Rover with Cart Model
+  - Differential drive base (1.2m x 0.8m)
+  - Cart attached via fixed joint (0.8m x 0.8m platform)
+  - ArUco marker (ID 42) on cart surface
+  - Downward camera NOT on this model (drone camera)
+-->
+<sdf version="1.9">
+  <model name="rover_with_cart">
+
+    <!-- ── Rover Base ─────────────────────────────── -->
+    <link name="base_link">
+      <pose>0 0 0.2 0 0 0</pose>
+      <inertial>
+        <mass>30.0</mass>
+        <inertia>
+          <ixx>1.5</ixx><iyy>2.0</iyy><izz>2.5</izz>
+        </inertia>
+      </inertial>
+      <collision name="body_col">
+        <geometry><box><size>1.2 0.8 0.4</size></box></geometry>
+      </collision>
+      <visual name="body_vis">
+        <geometry><box><size>1.2 0.8 0.4</size></box></geometry>
+        <material>
+          <ambient>0.2 0.2 0.7 1</ambient>
+          <diffuse>0.3 0.3 0.8 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Left Drive Wheel -->
+    <link name="left_wheel">
+      <pose>0.3 0.5 0.15 1.5707 0 0</pose>
+      <inertial>
+        <mass>2.0</mass>
+        <inertia><ixx>0.05</ixx><iyy>0.05</iyy><izz>0.08</izz></inertia>
+      </inertial>
+      <collision name="col">
+        <geometry><cylinder><radius>0.15</radius><length>0.08</length></cylinder></geometry>
+        <surface>
+          <friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction>
+        </surface>
+      </collision>
+      <visual name="vis">
+        <geometry><cylinder><radius>0.15</radius><length>0.08</length></cylinder></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient></material>
+      </visual>
+    </link>
+
+    <joint name="left_wheel_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>left_wheel</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <!-- Right Drive Wheel -->
+    <link name="right_wheel">
+      <pose>0.3 -0.5 0.15 1.5707 0 0</pose>
+      <inertial>
+        <mass>2.0</mass>
+        <inertia><ixx>0.05</ixx><iyy>0.05</iyy><izz>0.08</izz></inertia>
+      </inertial>
+      <collision name="col">
+        <geometry><cylinder><radius>0.15</radius><length>0.08</length></cylinder></geometry>
+        <surface>
+          <friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction>
+        </surface>
+      </collision>
+      <visual name="vis">
+        <geometry><cylinder><radius>0.15</radius><length>0.08</length></cylinder></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient></material>
+      </visual>
+    </link>
+
+    <joint name="right_wheel_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>right_wheel</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <!-- Rear Caster Wheel (free rolling) -->
+    <link name="caster_wheel">
+      <pose>-0.4 0 0.1 0 0 0</pose>
+      <inertial>
+        <mass>0.5</mass>
+        <inertia><ixx>0.01</ixx><iyy>0.01</iyy><izz>0.01</izz></inertia>
+      </inertial>
+      <collision name="col">
+        <geometry><sphere><radius>0.1</radius></sphere></geometry>
+        <surface>
+          <friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction>
+        </surface>
+      </collision>
+      <visual name="vis">
+        <geometry><sphere><radius>0.1</radius></sphere></geometry>
+        <material><ambient>0.3 0.3 0.3 1</ambient></material>
+      </visual>
+    </link>
+
+    <joint name="caster_joint" type="ball">
+      <parent>base_link</parent>
+      <child>caster_wheel</child>
+    </joint>
+
+    <!-- ── Cart (attached to rear of rover) ─────── -->
+    <link name="cart_platform">
+      <!-- Cart sits behind rover, raised to carry drone -->
+      <pose>-1.2 0 0.55 0 0 0</pose>
+      <inertial>
+        <mass>10.0</mass>
+        <inertia><ixx>0.3</ixx><iyy>0.5</iyy><izz>0.5</izz></inertia>
+      </inertial>
+      <collision name="col">
+        <geometry><box><size>0.9 0.9 0.08</size></box></geometry>
+      </collision>
+      <visual name="vis">
+        <geometry><box><size>0.9 0.9 0.08</size></box></geometry>
+        <material>
+          <ambient>0.5 0.3 0.1 1</ambient>
+          <diffuse>0.6 0.4 0.1 1</diffuse>
+        </material>
+      </visual>
+
+      <!-- ArUco Marker (ID=42) on cart surface - white background -->
+      <visual name="aruco_bg">
+        <pose>0 0 0.045 0 0 0</pose>
+        <geometry><box><size>0.6 0.6 0.001</size></box></geometry>
+        <material>
+          <ambient>0.95 0.95 0.95 1</ambient>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+        </material>
+      </visual>
+
+      <!-- ArUco marker pattern (simplified black square) -->
+      <visual name="aruco_inner">
+        <pose>0 0 0.046 0 0 0</pose>
+        <geometry><box><size>0.5 0.5 0.001</size></box></geometry>
+        <material>
+          <ambient>0.05 0.05 0.05 1</ambient>
+          <diffuse>0.05 0.05 0.05 1</diffuse>
+        </material>
+      </visual>
+      <!-- Note: Real ArUco texture would use a mesh with UV map.
+           For simulation, use a camera with calibration and real ArUco PNG texture -->
+    </link>
+
+    <!-- Cart legs (vertical supports) -->
+    <link name="cart_leg_FL">
+      <pose>-0.75 0.35 0.3 0 0 0</pose>
+      <inertial><mass>0.3</mass><inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia></inertial>
+      <collision name="col"><geometry><cylinder><radius>0.03</radius><length>0.5</length></cylinder></geometry></collision>
+      <visual name="vis"><geometry><cylinder><radius>0.03</radius><length>0.5</length></cylinder></geometry>
+        <material><ambient>0.3 0.3 0.3 1</ambient></material></visual>
+    </link>
+    <joint name="cart_leg_FL_joint" type="fixed">
+      <parent>cart_platform</parent><child>cart_leg_FL</child>
+    </joint>
+
+    <link name="cart_leg_FR">
+      <pose>-0.75 -0.35 0.3 0 0 0</pose>
+      <inertial><mass>0.3</mass><inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia></inertial>
+      <collision name="col"><geometry><cylinder><radius>0.03</radius><length>0.5</length></cylinder></geometry></collision>
+      <visual name="vis"><geometry><cylinder><radius>0.03</radius><length>0.5</length></cylinder></geometry>
+        <material><ambient>0.3 0.3 0.3 1</ambient></material></visual>
+    </link>
+    <joint name="cart_leg_FR_joint" type="fixed">
+      <parent>cart_platform</parent><child>cart_leg_FR</child>
+    </joint>
+
+    <joint name="cart_to_rover" type="fixed">
+      <parent>base_link</parent>
+      <child>cart_platform</child>
+    </joint>
+
+    <!-- ── Differential Drive Plugin ─────────────── -->
+    <plugin filename="gz-sim-diff-drive-system"
+            name="gz::sim::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>1.0</wheel_separation>
+      <wheel_radius>0.15</wheel_radius>
+      <odom_publish_frequency>20</odom_publish_frequency>
+      <topic>cmd_vel</topic>
+      <odom_topic>odom</odom_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+    </plugin>
+
+    <!-- ── Pose Publisher (for rover TF) ─────────── -->
+    <plugin filename="gz-sim-pose-publisher-system"
+            name="gz::sim::systems::PosePublisher">
+      <publish_link_pose>true</publish_link_pose>
+      <publish_nested_model_pose>true</publish_nested_model_pose>
+      <publish_frequency>20</publish_frequency>
+    </plugin>
+
+  </model>
+</sdf>

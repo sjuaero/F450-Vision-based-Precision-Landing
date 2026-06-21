@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>agri_bringup</name>
+  <version>0.1.0</version>
+  <description>Launch files and configuration for agricultural mission system bringup</description>
+  <maintainer email="user@example.com">user</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>agri_interfaces</depend>
+  <depend>agri_mission_manager</depend>
+  <depend>agri_llm_interface</depend>
+  <depend>agri_drone_controller</depend>
+  <depend>agri_rover_controller</depend>
+  <depend>agri_aruco_detector</depend>
+  <depend>agri_gazebo</depend>
+  <depend>ros_gz_sim</depend>
+  <depend>ros_gz_bridge</depend>
+  <depend>mavros</depend>
+  <depend>nav2_bringup</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -1,0 +1,10 @@
+string zone_id
+geometry_msgs/PoseArray waypoints
+float32 altitude
+---
+bool success
+float32 actual_coverage
+---
+int32 strips_completed
+int32 total_strips
+float32 coverage_percent

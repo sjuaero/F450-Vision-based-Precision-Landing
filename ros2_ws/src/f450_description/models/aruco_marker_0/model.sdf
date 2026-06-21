@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="aruco_marker_0">
+    <static>true</static>
+    <link name="link">
+      <visual name="visual">
+        <geometry>
+          <!-- 실제 마커 크기: 0.8m x 0.8m -->
+          <box><size>0.8 0.8 0.002</size></box>
+        </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://aruco_marker_0/materials/textures/aruco_0.png</albedo_map>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <box><size>0.8 0.8 0.002</size></box>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,34 @@
+mavros:
+  ros__parameters:
+    fcu_url: "udp://:14541@localhost:14581"
+    gcs_url: ""
+    target_system_id: 1
+    target_component_id: 1
+    fcu_protocol: "v2.0"
+    system_id: 255
+    component_id: 240
+
+    # Only load essential plugins
+    plugin_allowlist:
+      - sys_status
+      - sys_time
+      - command
+      - setpoint_position
+      - setpoint_velocity
+      - setpoint_raw
+      - local_position
+      - global_position
+      - home_position
+      - param
+      - mission
+      - safety_area
+      - geofence
+
+    local_position:
+      frame_id: "map"
+      tf_send: true
+      tf_frame_id: "map"
+      tf_child_frame_id: "base_link"
+
+    setpoint_position:
+      tf_listen: false

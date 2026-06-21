@@ -1,0 +1,278 @@
+<?xml version="1.0"?>
+<!--
+  Agricultural Field World for Gazebo Harmonic
+  Layout:
+    - Base/Shed: origin (0, 0)
+    - Zone A (North): (50, 80)  - 50x80m - Green
+    - Zone B (East):  (120, 50) - 60x70m - Yellow
+    - Zone C (South): (50, -60) - 55x75m - Orange
+    - Zone D (West):  (-70, 40) - 45x80m - Blue
+-->
+<sdf version="1.9">
+  <world name="agricultural_field">
+
+    <!-- Physics -->
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Plugins -->
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer"/>
+    <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure"/>
+
+    <!-- Lighting -->
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 100 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.3 0.3 0.3 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Ground Plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>500 500</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>500 500</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.4 0.35 0.2 1</ambient>
+            <diffuse>0.5 0.45 0.25 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  FIELD ZONES                                       -->
+    <!-- ═══════════════════════════════════════════════════ -->
+
+    <!-- Zone A - North Field (Green) centered at (50, 80) -->
+    <model name="zone_A">
+      <static>true</static>
+      <pose>50 80 0.02 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>50 80 0.04</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>50 80 0.04</size></box></geometry>
+          <material>
+            <ambient>0.1 0.6 0.1 0.8</ambient>
+            <diffuse>0.1 0.7 0.1 0.8</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Zone A Label -->
+    <model name="zone_A_sign">
+      <static>true</static>
+      <pose>50 80 2.0 0 0 0</pose>
+      <link name="link">
+        <visual name="vis">
+          <geometry><box><size>4 0.2 2</size></box></geometry>
+          <material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Zone B - East Field (Yellow) centered at (120, 50) -->
+    <model name="zone_B">
+      <static>true</static>
+      <pose>120 50 0.02 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>60 70 0.04</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>60 70 0.04</size></box></geometry>
+          <material>
+            <ambient>0.8 0.8 0.1 0.8</ambient>
+            <diffuse>0.9 0.9 0.1 0.8</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Zone C - South Field (Orange) centered at (50, -60) -->
+    <model name="zone_C">
+      <static>true</static>
+      <pose>50 -60 0.02 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>55 75 0.04</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>55 75 0.04</size></box></geometry>
+          <material>
+            <ambient>0.9 0.4 0.1 0.8</ambient>
+            <diffuse>0.9 0.5 0.1 0.8</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Zone D - West Field (Blue) centered at (-70, 40) -->
+    <model name="zone_D">
+      <static>true</static>
+      <pose>-70 40 0.02 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>45 80 0.04</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>45 80 0.04</size></box></geometry>
+          <material>
+            <ambient>0.1 0.3 0.9 0.8</ambient>
+            <diffuse>0.1 0.3 0.9 0.8</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  BASE / SHED                                       -->
+    <!-- ═══════════════════════════════════════════════════ -->
+
+    <!-- Shed floor -->
+    <model name="shed_floor">
+      <static>true</static>
+      <pose>0 0 0.05 0 0 0</pose>
+      <link name="link">
+        <visual name="vis">
+          <geometry><box><size>8 12 0.1</size></box></geometry>
+          <material>
+            <ambient>0.5 0.4 0.3 1</ambient>
+            <diffuse>0.6 0.5 0.35 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Shed walls -->
+    <model name="shed_wall_front">
+      <static>true</static>
+      <pose>0 -6 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>8 0.3 3</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>8 0.3 3</size></box></geometry>
+          <material><ambient>0.6 0.4 0.2 1</ambient><diffuse>0.7 0.5 0.3 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="shed_wall_back">
+      <static>true</static>
+      <pose>0 6 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>8 0.3 3</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>8 0.3 3</size></box></geometry>
+          <material><ambient>0.6 0.4 0.2 1</ambient><diffuse>0.7 0.5 0.3 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="shed_wall_left">
+      <static>true</static>
+      <pose>-4 0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>0.3 12 3</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>0.3 12 3</size></box></geometry>
+          <material><ambient>0.6 0.4 0.2 1</ambient><diffuse>0.7 0.5 0.3 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="shed_wall_right">
+      <static>true</static>
+      <pose>4 0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>0.3 12 3</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>0.3 12 3</size></box></geometry>
+          <material><ambient>0.6 0.4 0.2 1</ambient><diffuse>0.7 0.5 0.3 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Shed roof -->
+    <model name="shed_roof">
+      <static>true</static>
+      <pose>0 0 3.2 0 0 0</pose>
+      <link name="link">
+        <visual name="vis">
+          <geometry><box><size>8.5 12.5 0.4</size></box></geometry>
+          <material><ambient>0.4 0.15 0.1 1</ambient><diffuse>0.5 0.2 0.15 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  ROVER WITH CART + ARUCO MARKER                   -->
+    <!--  Spawned here as a placeholder; actual model       -->
+    <!--  spawned by PX4/launch via spawn_entity            -->
+    <!-- ═══════════════════════════════════════════════════ -->
+
+    <!-- ArUco marker plate on cart (visual reference) -->
+    <model name="aruco_cart_marker">
+      <static>false</static>
+      <pose>0 0 0.6 0 0 0</pose>
+      <link name="aruco_link">
+        <visual name="aruco_vis">
+          <geometry>
+            <box><size>0.5 0.5 0.01</size></box>
+          </geometry>
+          <!-- Black and white ArUco-like pattern via material -->
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.1 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+        <!-- White border around marker -->
+        <visual name="aruco_border">
+          <geometry>
+            <box><size>0.6 0.6 0.005</size></box>
+          </geometry>
+          <material>
+            <ambient>0.95 0.95 0.95 1</ambient>
+            <diffuse>0.95 0.95 0.95 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

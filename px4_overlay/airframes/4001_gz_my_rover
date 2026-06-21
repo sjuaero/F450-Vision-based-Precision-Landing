@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# @name My Custom Rover
+#
+# @type Rover
+# @class Boat
+#
+# @maintainer YourName
+#
+
+. post_init_asilent
+
+set VEHICLE_TYPE rover
+set MIXER rover
+
+set PARAM_ID 4001

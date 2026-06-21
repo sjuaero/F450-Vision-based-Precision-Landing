@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version="1.9">
+  <world name="farmland">
+
+    <physics type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    <gravity>0 0 -9.8</gravity>
+    <atmosphere type="adiabatic"/>
+
+    <scene>
+      <grid>false</grid>
+      <ambient>0.6 0.6 0.6 1</ambient>
+      <background>0.5 0.7 0.9 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <light name="sun" type="directional">
+      <pose>0 0 500 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1</intensity>
+      <direction>0.001 0.625 -0.78</direction>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.3 0.3 0.3 1</specular>
+      <attenuation>
+        <range>2000</range><linear>0</linear>
+        <constant>1</constant><quadratic>0</quadratic>
+      </attenuation>
+    </light>
+
+    <!-- 세종대학교 운동장 GPS 좌표 -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>37.5484</latitude_deg>
+      <longitude_deg>127.0736</longitude_deg>
+      <elevation>20</elevation>
+    </spherical_coordinates>
+
+    <!-- ========== 지면 (150x80m) ========== -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>1 1</size></plane>
+          </geometry>
+          <surface><friction><ode/></friction></surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>150 80</size></plane>
+          </geometry>
+          <material>
+            <ambient>0.55 0.45 0.25 1</ambient>
+            <diffuse>0.55 0.45 0.25 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 십자 도로 EW (108.4m) ========== -->
+    <model name="road_EW">
+      <static>true</static>
+      <pose>0 0 0.001 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>108.4 4 0.002</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>108.4 4 0.002</size></box></geometry>
+          <material>
+            <ambient>0.78 0.70 0.50 1</ambient>
+            <diffuse>0.78 0.70 0.50 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 십자 도로 NS (54.2m) ========== -->
+    <model name="road_NS">
+      <static>true</static>
+      <pose>0 0 0.001 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>4 54.2 0.002</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>4 54.2 0.002</size></box></geometry>
+          <material>
+            <ambient>0.78 0.70 0.50 1</ambient>
+            <diffuse>0.78 0.70 0.50 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 농경지 A (NW) : center (-28.1, 14.55) 52.2x25.1m ========== -->
+    <model name="farmland_A">
+      <static>true</static>
+      <pose>-28.1 14.55 0.003 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>52.2 25.1 0.004</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>52.2 25.1 0.004</size></box></geometry>
+          <material>
+            <ambient>0.12 0.52 0.08 1</ambient>
+            <diffuse>0.12 0.52 0.08 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 농경지 B (NE) : center (28.1, 14.55) 52.2x25.1m ========== -->
+    <model name="farmland_B">
+      <static>true</static>
+      <pose>28.1 14.55 0.003 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>52.2 25.1 0.004</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>52.2 25.1 0.004</size></box></geometry>
+          <material>
+            <ambient>0.08 0.45 0.15 1</ambient>
+            <diffuse>0.08 0.45 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 농경지 C (SW) : center (-28.1, -14.55) 52.2x25.1m ========== -->
+    <model name="farmland_C">
+      <static>true</static>
+      <pose>-28.1 -14.55 0.003 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>52.2 25.1 0.004</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>52.2 25.1 0.004</size></box></geometry>
+          <material>
+            <ambient>0.20 0.55 0.05 1</ambient>
+            <diffuse>0.20 0.55 0.05 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 농경지 D (SE) : center (28.1, -14.55) 52.2x25.1m ========== -->
+    <model name="farmland_D">
+      <static>true</static>
+      <pose>28.1 -14.55 0.003 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>52.2 25.1 0.004</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>52.2 25.1 0.004</size></box></geometry>
+          <material>
+            <ambient>0.05 0.48 0.20 1</ambient>
+            <diffuse>0.05 0.48 0.20 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 표지판 A (NW 농장 입구, 빨간 기둥) ========== -->
+    <model name="sign_A">
+      <static>true</static>
+      <pose>-4 14.55 0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <pose>0 0 1.0 0 0 0</pose>
+          <geometry><cylinder><radius>0.05</radius><length>2.0</length></cylinder></geometry>
+        </collision>
+        <visual name="pole">
+          <pose>0 0 1.0 0 0 0</pose>
+          <geometry><cylinder><radius>0.05</radius><length>2.0</length></cylinder></geometry>
+          <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+        </visual>
+        <visual name="board">
+          <pose>0 0 2.3 0 0 0</pose>
+          <geometry><box><size>1.2 0.15 0.7</size></box></geometry>
+          <material><ambient>1 0.95 0 1</ambient><diffuse>1 0.95 0 1</diffuse></material>
+        </visual>
+        <visual name="label">
+          <pose>0 -0.09 2.3 0 0 0</pose>
+          <geometry>
+            <text>
+              <font_name>Liberation Sans Bold</font_name>
+              <char_height>0.55</char_height>
+              <text>A농장</text>
+            </text>
+          </geometry>
+          <material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.05 0.05 0.05 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 표지판 B (NE 농장 입구, 파란 기둥) ========== -->
+    <model name="sign_B">
+      <static>true</static>
+      <pose>4 14.55 0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <pose>0 0 1.0 0 0 0</pose>
+          <geometry><cylinder><radius>0.05</radius><length>2.0</length></cylinder></geometry>
+        </collision>
+        <visual name="pole">
+          <pose>0 0 1.0 0 0 0</pose>
+          <geometry><cylinder><radius>0.05</radius><length>2.0</length></cylinder></geometry>
+          <material><ambient>0 0.2 1 1</ambient><diffuse>0 0.2 1 1</diffuse></material>
+        </visual>
+        <visual name="board">
+          <pose>0 0 2.3 0 0 0</pose>
+          <geometry><box><size>1.2 0.15 0.7</size></box></geometry>
+          <material><ambient>1 0.95 0 1</ambient><diffuse>1 0.95 0 1</diffuse></material>
+        </visual>
+        <visual name="label">
+          <pose>0 -0.09 2.3 0 0 0</pose>
+          <geometry>
+            <text>
+              <font_name>Liberation Sans Bold</font_name>
+              <char_height>0.55</char_height>
+              <text>B농장</text>
+            </text>
+          </geometry>
+          <material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.05 0.05 0.05 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 표지판 C (SW 농장 입구, 초록 기둥) ========== -->
+    <model name="sign_C">
+      <static>true</static>
+      <pose>-4 -14.55 0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <pose>0 0 1.0 0 0 0</pose>
+          <geometry><cylinder><radius>0.05</radius><length>2.0</length></cylinder></geometry>
+        </collision>
+        <visual name="pole">
+          <pose>0 0 1.0 0 0 0</pose>
+          <geometry><cylinder><radius>0.05</radius><length>2.0</length></cylinder></geometry>
+          <material><ambient>0 0.65 0.1 1</ambient><diffuse>0 0.65 0.1 1</diffuse></material>
+        </visual>
+        <visual name="board">
+          <pose>0 0 2.3 0 0 0</pose>
+          <geometry><box><size>1.2 0.15 0.7</size></box></geometry>
+          <material><ambient>1 0.95 0 1</ambient><diffuse>1 0.95 0 1</diffuse></material>
+        </visual>
+        <visual name="label">
+          <pose>0 -0.09 2.3 0 0 0</pose>
+          <geometry>
+            <text>
+              <font_name>Liberation Sans Bold</font_name>
+              <char_height>0.55</char_height>
+              <text>C농장</text>
+            </text>
+          </geometry>
+          <material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.05 0.05 0.05 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== 표지판 D (SE 농장 입구, 보라 기둥) ========== -->
+    <model name="sign_D">
+      <static>true</static>
+      <pose>4 -14.55 0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <pose>0 0 1.0 0 0 0</pose>
+          <geometry><cylinder><radius>0.05</radius><length>2.0</length></cylinder></geometry>
+        </collision>
+        <visual name="pole">
+          <pose>0 0 1.0 0 0 0</pose>
+          <geometry><cylinder><radius>0.05</radius><length>2.0</length></cylinder></geometry>
+          <material><ambient>0.6 0 0.7 1</ambient><diffuse>0.6 0 0.7 1</diffuse></material>
+        </visual>
+        <visual name="board">
+          <pose>0 0 2.3 0 0 0</pose>
+          <geometry><box><size>1.2 0.15 0.7</size></box></geometry>
+          <material><ambient>1 0.95 0 1</ambient><diffuse>1 0.95 0 1</diffuse></material>
+        </visual>
+        <visual name="label">
+          <pose>0 -0.09 2.3 0 0 0</pose>
+          <geometry>
+            <text>
+              <font_name>Liberation Sans Bold</font_name>
+              <char_height>0.55</char_height>
+              <text>D농장</text>
+            </text>
+          </geometry>
+          <material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.05 0.05 0.05 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== F450 드론 (로버 상판 위, 정중앙) ========== -->
+    <model name="f450_on_rover">
+      <static>true</static>
+      <pose>0 0 0.22 0 0 0</pose>
+      <link name="body">
+
+        <!-- 동체 STL: CATIA Y=up → Gazebo Z=up 보정 roll=+90° -->
+        <visual name="body_visual">
+          <pose>0 0 0 1.5708 0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/user/PX4-Autopilot/Tools/simulation/gz/models/f450/meshes/f450_body.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.15 0.15 0.15 1</ambient>
+            <diffuse>0.20 0.20 0.20 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+
+        <!-- 프로펠러 0: Front-Right (CCW) -->
+        <visual name="prop_0_visual">
+          <pose>0.1591 -0.1591 0.05 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/user/PX4-Autopilot/Tools/simulation/gz/models/f450/meshes/f450_prop.stl</uri>
+            </mesh>
+          </geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+        </visual>
+
+        <!-- 프로펠러 1: Rear-Left (CCW) -->
+        <visual name="prop_1_visual">
+          <pose>-0.1591 0.1591 0.05 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/user/PX4-Autopilot/Tools/simulation/gz/models/f450/meshes/f450_prop.stl</uri>
+            </mesh>
+          </geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+        </visual>
+
+        <!-- 프로펠러 2: Front-Left (CW, 180° 회전) -->
+        <visual name="prop_2_visual">
+          <pose>0.1591 0.1591 0.05 0 0 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/user/PX4-Autopilot/Tools/simulation/gz/models/f450/meshes/f450_prop.stl</uri>
+            </mesh>
+          </geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+        </visual>
+
+        <!-- 프로펠러 3: Rear-Right (CW, 180° 회전) -->
+        <visual name="prop_3_visual">
+          <pose>-0.1591 -0.1591 0.05 0 0 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/user/PX4-Autopilot/Tools/simulation/gz/models/f450/meshes/f450_prop.stl</uri>
+            </mesh>
+          </geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+        </visual>
+
+      </link>
+    </model>
+
+  </world>
+</sdf>

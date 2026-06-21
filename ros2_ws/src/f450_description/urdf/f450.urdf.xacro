@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<robot name="f450" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+    mesh_path: 런치파일에서 절대경로로 주입
+    예) xacro f450.urdf.xacro mesh_path:=/home/user/ros2_ws/install/.../meshes
+  -->
+  <xacro:arg name="mesh_path" default=""/>
+
+  <xacro:property name="PI"         value="3.14159265359"/>
+  <xacro:property name="arm_length" value="0.1591"/>
+  <xacro:property name="motor_z"    value="0.058"/>
+  <xacro:property name="cam_z"      value="-0.08"/>
+  <xacro:property name="mp"         value="$(arg mesh_path)"/>
+  <!-- ── 모터 物理 상수 (JMT F15843, 920KV + 1045 prop, 3S 11.1V 기준) ── -->
+  <xacro:property name="max_rot_vel"     value="1069.0"/>   <!-- rad/s = KV*V*2pi/60 -->
+  <xacro:property name="motor_constant"  value="7.73e-6"/>  <!-- kT = T_max / w_max^2 -->
+  <xacro:property name="moment_constant" value="0.02"/>     <!-- kQ/kT (m), 1045 prop 기준 -->
+
+  <material name="dark_carbon"><color rgba="0.15 0.15 0.15 1.0"/></material>
+  <material name="black_prop">  <color rgba="0.08 0.08 0.08 1.0"/></material>
+  <material name="camera_grey"> <color rgba="0.30 0.30 0.30 1.0"/></material>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <geometry>
+        <mesh filename="file://${mp}/f450_body.stl"
+              scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark_carbon"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.005" rpy="0 0 0"/>
+      <geometry><box size="0.32 0.32 0.04"/></geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 -0.163" rpy="0 0 0"/>
+      <geometry><box size="0.22 0.22 0.01"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="1.345"/>
+      <origin xyz="0.006264 0.000157 0.00833" rpy="0 0 0"/>
+      <inertia ixx="0.005"     ixy="-1.692e-5" ixz="-1.206e-4"
+               iyy="0.005"    iyz="-7.965e-7"  izz="0.007"/>
+    </inertial>
+  </link>
+
+  <xacro:macro name="rotor" params="name x y z cw">
+    <link name="${name}_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 ${PI if cw else 0}"/>
+        <geometry>
+          <mesh filename="file://${mp}/f450_prop.stl"
+                scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="black_prop"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 -0.005" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.130" length="0.010"/></geometry>
+      </collision>
+      <inertial>
+        <mass value="0.01"/>
+        <origin xyz="0.000001 -0.0000002845 0.006174" rpy="0 0 0"/>
+        <inertia ixx="8.593e-6"  ixy="4.904e-6" ixz="0"
+                 iyy="4.596e-5" iyz="0"          izz="4.568e-5"/>
+      </inertial>
+    </link>
+    <joint name="${name}_joint" type="continuous">
+      <parent link="base_link"/>
+      <child  link="${name}_link"/>
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/>
+      <axis xyz="0 0 ${-1 if cw else 1}"/>
+      <dynamics damping="0.001" friction="0.0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:rotor name="rotor_0" x="${ arm_length}" y="${-arm_length}" z="${motor_z}" cw="false"/>
+  <xacro:rotor name="rotor_1" x="${-arm_length}" y="${ arm_length}" z="${motor_z}" cw="false"/>
+  <xacro:rotor name="rotor_2" x="${ arm_length}" y="${ arm_length}" z="${motor_z}" cw="true"/>
+  <xacro:rotor name="rotor_3" x="${-arm_length}" y="${-arm_length}" z="${motor_z}" cw="true"/>
+
+  <!-- ── 모터 동역학 모델 (Gazebo MulticopterMotorModel) ── -->
+  <xacro:macro name="motor_model" params="name number direction">
+    <gazebo>
+      <plugin filename="gz-sim-multicopter-motor-model-system"
+              name="gz::sim::systems::MulticopterMotorModel">
+        <jointName>${name}_joint</jointName>
+        <linkName>${name}_link</linkName>
+        <turningDirection>${direction}</turningDirection>
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>${max_rot_vel}</maxRotVelocity>
+        <motorConstant>${motor_constant}</motorConstant>
+        <momentConstant>${moment_constant}</momentConstant>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
+        <motorNumber>${number}</motorNumber>
+        <rotorDragCoefficient>0.000175</rotorDragCoefficient>
+        <rollingMomentCoefficient>1.0e-6</rollingMomentCoefficient>
+        <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+        <motorType>velocity</motorType>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:motor_model name="rotor_0" number="0" direction="ccw"/>
+  <xacro:motor_model name="rotor_1" number="1" direction="ccw"/>
+  <xacro:motor_model name="rotor_2" number="2" direction="cw"/>
+  <xacro:motor_model name="rotor_3" number="3" direction="cw"/>
+
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://${mp}/camera_base.stl"
+              scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="camera_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.129 0.017 0.045"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.100"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="2.0e-5" ixy="0" ixz="0"
+               iyy="2.0e-5" iyz="0"
+               izz="2.0e-5"/>
+    </inertial>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="camera_link"/>
+    <origin xyz="0 0 ${cam_z}" rpy="${PI} 0 0"/>
+  </joint>
+
+  <link name="camera_optical_frame"/>
+  <joint name="camera_optical_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child  link="camera_optical_frame"/>
+    <origin xyz="0 0 0" rpy="${-PI/2} 0 ${-PI/2}"/>
+  </joint>
+
+  <gazebo reference="camera_link">
+    <sensor name="pc3506_camera" type="camera">
+      <always_on>1</always_on>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+      <camera name="pc3506">
+        <horizontal_fov>0.899</horizontal_fov>
+        <image>
+          <width>640</width><height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip><near>0.05</near><far>50.0</far></clip>
+        <noise><type>gaussian</type><mean>0.0</mean><stddev>0.005</stddev></noise>
+        <lens>
+          <intrinsics>
+            <fx>662.62</fx><fy>618.45</fy>
+            <cx>409.89</cx><cy>220.37</cy><s>0</s>
+          </intrinsics>
+        </lens>
+      </camera>
+      <topic>/f450/camera/image_raw</topic>
+      <gz_frame_id>camera_optical_frame</gz_frame_id>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="base_link">
+    <sensor name="imu_sensor" type="imu">
+      <always_on>1</always_on>
+      <update_rate>250</update_rate>
+      <imu>
+        <angular_velocity>
+          <x><noise type="gaussian"><mean>0</mean><stddev>0.005</stddev></noise></x>
+          <y><noise type="gaussian"><mean>0</mean><stddev>0.005</stddev></noise></y>
+          <z><noise type="gaussian"><mean>0</mean><stddev>0.005</stddev></noise></z>
+        </angular_velocity>
+        <linear_acceleration>
+          <x><noise type="gaussian"><mean>0</mean><stddev>0.02</stddev></noise></x>
+          <y><noise type="gaussian"><mean>0</mean><stddev>0.02</stddev></noise></y>
+          <z><noise type="gaussian"><mean>0</mean><stddev>0.02</stddev></noise></z>
+        </linear_acceleration>
+      </imu>
+      <topic>/f450/imu</topic>
+      <gz_frame_id>base_link</gz_frame_id>
+    </sensor>
+  </gazebo>
+
+</robot>

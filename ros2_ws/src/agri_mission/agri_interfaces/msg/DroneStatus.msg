@@ -1,0 +1,9 @@
+std_msgs/Header header
+string flight_mode
+bool is_armed
+bool is_connected
+float32 altitude_m
+float32 battery_percent
+float32 spray_progress
+string landing_phase
+geometry_msgs/Point position

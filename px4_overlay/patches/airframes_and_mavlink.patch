@@ -1,0 +1,37 @@
+diff --git a/ROMFS/px4fmu_common/init.d-posix/airframes/CMakeLists.txt b/ROMFS/px4fmu_common/init.d-posix/airframes/CMakeLists.txt
+index a2e2a4d290..ea899e0bb2 100644
+--- a/ROMFS/px4fmu_common/init.d-posix/airframes/CMakeLists.txt
++++ b/ROMFS/px4fmu_common/init.d-posix/airframes/CMakeLists.txt
+@@ -88,6 +88,7 @@ px4_add_romfs_files(
+ 	4019_gz_x500_gimbal
+ 	4020_gz_tiltrotor
+ 	4021_gz_x500_flow
++	4022_gz_f450
+ 
+ 	6011_gazebo-classic_typhoon_h480
+ 	6011_gazebo-classic_typhoon_h480.post
+@@ -112,6 +113,7 @@ px4_add_romfs_files(
+ 	17002_flightgear_tf-g2
+ 
+ 	50000_gz_rover_differential
++	50001_gz_hbx16889_rover
+ 	51000_gz_rover_ackermann
+ 	52000_gz_rover_mecanum
+ 
+diff --git a/ROMFS/px4fmu_common/init.d-posix/px4-rc.mavlink b/ROMFS/px4fmu_common/init.d-posix/px4-rc.mavlink
+index 17ef44521b..60c6ab5154 100644
+--- a/ROMFS/px4fmu_common/init.d-posix/px4-rc.mavlink
++++ b/ROMFS/px4fmu_common/init.d-posix/px4-rc.mavlink
+@@ -9,9 +9,11 @@ udp_onboard_payload_port_remote=$((14030+px4_instance))
+ udp_onboard_gimbal_port_local=$((13030+px4_instance))
+ udp_onboard_gimbal_port_remote=$((13280+px4_instance))
+ udp_gcs_port_local=$((18570+px4_instance))
++udp_gcs_port_remote=$((14550+10*px4_instance))
++udp_gcs_target_host=${PX4_GCS_HOST:=172.18.144.1}
+ 
+ # GCS link
+-mavlink start -x -u $udp_gcs_port_local -r 4000000 -f
++mavlink start -x -u $udp_gcs_port_local -r 4000000 -f -o $udp_gcs_port_remote -t $udp_gcs_target_host
+ mavlink stream -r 50 -s POSITION_TARGET_LOCAL_NED -u $udp_gcs_port_local
+ mavlink stream -r 50 -s LOCAL_POSITION_NED -u $udp_gcs_port_local
+ mavlink stream -r 50 -s GLOBAL_POSITION_INT -u $udp_gcs_port_local

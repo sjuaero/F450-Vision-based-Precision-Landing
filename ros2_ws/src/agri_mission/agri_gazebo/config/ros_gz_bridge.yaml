@@ -1,0 +1,32 @@
+# ros_gz_bridge topic mappings for Gazebo Harmonic <-> ROS2 Jazzy
+# World: f450_landing  |  Drone model: f450_1
+# Direction: ROS_TO_GZ or GZ_TO_ROS or BIDIRECTIONAL
+
+# ── Drone Camera ──────────────────────────────────────────────
+# f450 모델 SDF의 <topic>/f450/camera/image_raw</topic> 에서 publish
+- ros_topic_name: /drone/camera/image_raw
+  gz_topic_name: /f450/camera/image_raw
+  ros_type_name: sensor_msgs/msg/Image
+  gz_type_name: gz.msgs.Image
+  direction: GZ_TO_ROS
+
+# Gazebo 카메라 센서는 image 토픽 + "/camera_info" suffix로 camera_info 자동 publish
+- ros_topic_name: /drone/camera/camera_info
+  gz_topic_name: /f450/camera/image_raw/camera_info
+  ros_type_name: sensor_msgs/msg/CameraInfo
+  gz_type_name: gz.msgs.CameraInfo
+  direction: GZ_TO_ROS
+
+# ── Drone IMU ─────────────────────────────────────────────────
+- ros_topic_name: /drone/imu
+  gz_topic_name: /world/f450_landing/model/f450_1/link/base_link/sensor/imu_sensor/imu
+  ros_type_name: sensor_msgs/msg/Imu
+  gz_type_name: gz.msgs.IMU
+  direction: GZ_TO_ROS
+
+# ── Clock (use_sim_time 필수) ────────────────────────────────
+- ros_topic_name: /clock
+  gz_topic_name: /clock
+  ros_type_name: rosgraph_msgs/msg/Clock
+  gz_type_name: gz.msgs.Clock
+  direction: GZ_TO_ROS

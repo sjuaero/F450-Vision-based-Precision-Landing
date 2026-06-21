@@ -1,0 +1,6 @@
+std_msgs/Header header
+string nav_state
+float32 distance_to_goal_m
+float32 battery_percent
+geometry_msgs/Pose current_pose
+string current_zone
