@@ -7,6 +7,12 @@ F450 드론과 로버(R1 / HBX 16889)가 협동하는 **농업 방역 미션**�
 <sub>왼쪽: 하방 카메라 인식 화면 (<code>/landing/debug_image</code>) · 오른쪽: Gazebo. 최종 채택한 P 제어로 고도 10 m에서 ArUco 패드 중앙에 정렬하며 하강</sub>
 </p>
 
+| 문서 | 내용 |
+|---|---|
+| [시뮬레이션 구축 과정](docs/simulation_setup.md) | 로버·F450 모델 제작(CAD 물성치 → Xacro/URDF → SDF), 추력·토크 계수 산정, Gazebo 환경 |
+| [비전 기반 정밀착륙 알고리즘](docs/vision_landing_algorithm.md) | 3단계 인식, 픽셀 오프셋 → 속도 명령 변환, 하강 로직, 카메라 캘리브레이션 GUI |
+| [실기체 하드웨어](docs/hardware.md) | 착륙 패드, 전원 구성 사진 |
+
 ---
 
 ## 개발 과정
@@ -31,6 +37,35 @@ F450 드론과 로버(R1 / HBX 16889)가 협동하는 **농업 방역 미션**�
 
 ---
 
+## 시뮬레이션 구축
+
+정밀착륙 제어를 믿고 시험하려면 모델의 형상과 물성치가 실제와 가까워야 합니다. 그래서 로버와 드론 모두 CAD에서 구한 값을 모델에 넣었습니다. 자세한 과정은 [시뮬레이션 구축 과정](docs/simulation_setup.md)에 있습니다.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/slides/sim_03_inertia_to_xacro.jpg" width="100%"></td>
+<td width="50%"><img src="docs/images/slides/f450_08_inertia_to_sdf.jpg" width="100%"></td>
+</tr>
+<tr>
+<td><b>로버</b>: CAD에서 부품의 부피·질량·관성모멘트를 구해 Xacro에 반영하고 URDF → SDF로 변환</td>
+<td><b>F450</b>: CATIA 모델의 질량·무게중심·관성 텐서를 SDF <code>base_link</code>에 반영</td>
+</tr>
+<tr>
+<td><img src="docs/images/slides/f450_06_coefficient_iteration.jpg" width="100%"></td>
+<td><img src="docs/images/slides/f450_10_motor_plugin.jpg" width="100%"></td>
+</tr>
+<tr>
+<td><b>추력·토크 계수</b>: 프로펠러 성능 데이터와 호버링 조건으로 반복 계산해 $b$, $d$ 결정</td>
+<td><b>모터 모델</b>: 구한 계수를 Gazebo <code>MulticopterMotorModel</code> 플러그인에 입력</td>
+</tr>
+</table>
+
+- 형상을 알 수 없는 로버 차체 부품은 박스·실린더 같은 기본 도형과 관성모멘트 공식으로 대체했습니다.
+- 추력은 $T = b\,\omega^2$, 반토크는 $Q = d\,\omega^2$로 모델링하고, $b = C_T\,ho\,D^4 / 4\pi^2$ 관계로 계수를 구했습니다.
+- ROS 2·Gazebo는 ENU, PX4는 NED 좌표계를 쓰므로 카메라 오프셋을 속도 명령으로 바꿀 때 축 방향을 맞췄습니다.
+
+---
+
 ## 정밀착륙 알고리즘
 
 ```mermaid
@@ -42,7 +77,11 @@ flowchart LR
     GZ --> CAM
 ```
 
+설계 배경과 수식 유도, 카메라 캘리브레이션은 [비전 기반 정밀착륙 알고리즘](docs/vision_landing_algorithm.md)에 자세히 정리했습니다.
+
 ### 1) 착륙 패드 3단계 인식 (`landing_pad_detector_node.py`)
+
+<p align="center"><img src="docs/images/slides/vision_02_state_machine.jpg" width="75%"></p>
 
 | 상태 | 전환 조건 | 인식 대상 | 고도 추정 |
 |---|---|---|---|
@@ -55,6 +94,10 @@ flowchart LR
 - 디버그 영상(`/landing/debug_image`)에는 상태·고도·오프셋이 함께 표시됩니다.
 
 ### 2) 속도 제어 착륙 (`scripts/drone_mission.py`)
+
+<p align="center"><img src="docs/images/slides/vision_04_pixel_offset_to_velocity.jpg" width="75%"></p>
+
+핀홀 카메라 모델로 마커 중심과 영상 중심의 차이(픽셀 오프셋)를 구하고, 여기에 게인을 곱해 기체 속도 명령으로 바꿉니다.
 
 - **수평 속도**: 영상 중심과 타겟 중심의 픽셀 오프셋에 비례하는 P 제어입니다(게인 0.001, ±1.0 m/s 제한).
   - 카메라 +X(오른쪽)는 NED +East, +Y(아래)는 NED +North에 대응합니다.
@@ -102,6 +145,17 @@ flowchart LR
 
 <table>
 <tr>
+<td width="30%"><img src="docs/images/hardware/landing_pad_real.jpg" width="100%"></td>
+<td width="70%"><img src="docs/images/slides/camera_04_gui_overview.jpg" width="100%"></td>
+</tr>
+<tr>
+<td>실제 착륙 패드 (아래쪽은 로버)</td>
+<td>팀에서 만든 카메라 캘리브레이션 GUI. 노출·화이트 밸런스·HSV 임계값을 화면에서 조절하고 JSON으로 저장</td>
+</tr>
+</table>
+
+<table>
+<tr>
 <th width="50%">① 인식 거리 시험 (실내)</th>
 <th width="50%">② 비행 중 하방 카메라 시험 (실외)</th>
 </tr>
@@ -110,7 +164,7 @@ flowchart LR
 <td><img src="docs/images/real_flight_camera_test.gif" width="100%"></td>
 </tr>
 <tr>
-<td>복도에서 패드를 먼 거리부터 카메라 쪽으로 가져오며 인식 단계를 확인. 원거리에서는 적색 영역만 잡히고, 가까워질수록 ArUco 인식 개수가 늘어 근거리에서 4개가 모두 인식됨</td>
+<td>바닥에 놓은 패드로 인식을 확인한 뒤, 복도에서 패드를 먼 거리부터 카메라 쪽으로 가져오며 인식 단계를 확인. 원거리에서는 적색 영역만 잡히고, 가까워질수록 ArUco 인식 개수가 늘어 근거리에서 4개가 모두 인식됨</td>
 <td>카메라를 기체에 달고 실제로 비행하며 하방 영상을 확인. 패드가 시야에 들어오자 적색 영역에 이어 ArUco 4개가 인식됨</td>
 </tr>
 <tr>
@@ -120,6 +174,8 @@ flowchart LR
 </table>
 
 원거리 적색 → 근거리 ArUco로 넘어가는 단계적 인식이 실제 카메라에서도 시뮬레이션과 같은 순서로 동작하는 것을 확인했습니다. 실기체 자동 착륙 제어까지는 이 영상에 포함되어 있지 않습니다.
+
+패드를 확정하기 전의 초기 인식 시험(마커 크기별 거리 추정, 색 영역 인식)은 [알고리즘 문서 7절](docs/vision_landing_algorithm.md#7-초기-인식-시험)에, 사용한 부품 사진은 [실기체 하드웨어](docs/hardware.md)에 있습니다.
 
 ---
 
@@ -153,7 +209,10 @@ px4_overlay/            # PX4-Autopilot(업스트림) 위에 추가/수정해야
                                   # r1_rover_overlay/ 는 기존 r1_rover 모델에 추가/교체할 파일
 
 docs/
-  images/               # README GIF
+  simulation_setup.md          # 시뮬레이션 구축 과정
+  vision_landing_algorithm.md  # 비전 기반 정밀착륙 알고리즘
+  hardware.md                  # 실기체 하드웨어
+  images/               # README GIF, 발표 자료 그림(slides/), 실물 사진(hardware/)
   videos/               # 개발 단계별 영상 (01~06 시뮬레이션, 07~08 실환경 검증)
 ```
 
