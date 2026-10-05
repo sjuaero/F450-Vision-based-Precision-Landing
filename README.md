@@ -4,7 +4,7 @@ F450 드론과 로버(R1 / HBX 16889)가 협동하는 **농업 방역 미션**�
 
 <p align="center">
 <img src="docs/images/precision_landing_p.gif" width="80%"><br>
-<sub>왼쪽: 하방 카메라 인식 화면 (<code>/landing/debug_image</code>) · 오른쪽: Gazebo. 고도 10 m에서 ArUco 패드 중앙으로 정렬하며 하강</sub>
+<sub>왼쪽: 하방 카메라 인식 화면 (<code>/landing/debug_image</code>) · 오른쪽: Gazebo. 최종 채택한 P 제어로 고도 10 m에서 ArUco 패드 중앙에 정렬하며 하강</sub>
 </p>
 
 ---
@@ -15,16 +15,17 @@ F450 드론과 로버(R1 / HBX 16889)가 협동하는 **농업 방역 미션**�
 |---|---|---|---|
 | 1. 시뮬레이션 환경 구축 | 2026.05 초 | PX4 SITL + Gazebo 농경지 월드(farmland A~D), R1 로버 키보드(WASD) 주행 | [01](docs/videos/01_rover_teleop_farmland.mp4) |
 | 2. 드론·로버 멀티 SITL | 2026.05 말 | F450 모델 제작, MAVSDK Offboard 이동 테스트, 로버 이동 → 드론 방역(지그재그) → 복귀 미션 | [02](docs/videos/02_drone_offboard_test_farmland.mp4) |
-| 3. 비전 기반 정밀착륙 | 2026.06 | 착륙 패드 3단계 인식 노드, ROS 2 ↔ MAVSDK 오프셋 연동, 속도 제어 착륙 | [03](docs/videos/03_precision_landing_attempt_1.mp4) · [04](docs/videos/04_precision_landing_attempt_2.mp4) · [05](docs/videos/05_precision_landing_PD.mp4) · [**06**](docs/videos/06_precision_landing_P_final.mp4) |
+| 3. 비전 기반 정밀착륙 | 2026.06 | 착륙 패드 3단계 인식 노드, ROS 2 ↔ MAVSDK 오프셋 연동, 속도 제어 착륙 | [03](docs/videos/03_precision_landing_attempt_1.mp4) · [04](docs/videos/04_precision_landing_attempt_2.mp4) |
+| 4. 제어기 비교 (PD → P) | 2026.06 말 | PD 제어를 시험한 뒤 P 제어 + 하강 결합 방식을 최종 채택 ([비교](#3-p-제어-vs-pd-제어)) | [05 (PD)](docs/videos/05_precision_landing_PD.mp4) · [**06 (P, 최종)**](docs/videos/06_precision_landing_P_final.mp4) |
+| 5. 실환경 인식 검증 | 2026.06 말 | 실제 착륙 패드와 카메라로 인식 거리 시험, 기체 탑재 후 비행 중 하방 카메라 인식 확인 ([실환경 검증](#실환경-검증)) | [07](docs/videos/07_real_pad_detection_range_test.mp4) · [08](docs/videos/08_real_flight_camera_test.mp4) |
 
 > 1~2단계는 [px4-drone-rover-sim](https://github.com/sjuaero/px4-drone-rover-sim)에서 진행한 초기 버전이며, 모델·월드·스크립트를 이 저장소로 통합했습니다. 당시의 방역 미션 스크립트는 [`scripts/spray_mission.py`](scripts/spray_mission.py)로 보존했습니다.
 
 <p>
 <img src="docs/images/rover_teleop_farmland.gif" height="320">
 <img src="docs/images/drone_offboard_test.gif" height="320">
-<img src="docs/images/precision_landing_pd.gif" height="320">
 </p>
-<p><sub>왼쪽부터: R1 로버 키보드 주행 · F450 Offboard 이동 테스트(전·후·좌·우) · PD 제어 정밀착륙 실험</sub></p>
+<p><sub>왼쪽부터: R1 로버 키보드 주행 · F450 Offboard 이동 테스트(전·후·좌·우)</sub></p>
 
 전체 영상은 [`docs/videos/`](docs/videos)에 있습니다. GitHub 파일 화면에서 **View raw** 또는 다운로드로 재생할 수 있습니다.
 
@@ -66,7 +67,59 @@ flowchart LR
 |---|---|
 | 부호 반전 제거 | 오프셋을 한 번 더 반전해 타겟에서 멀어지는 **양성 피드백(발산)**이 생기던 문제를 수정 |
 | 하강·정렬 결합 | 정렬 오차가 클수록 하강 속도를 연속적으로 줄여, 수평 정렬을 먼저 맞춘 뒤 내려가도록 변경 |
-| PD 제어 실험 | 미분항을 추가한 버전을 시험한 뒤([05](docs/videos/05_precision_landing_PD.mp4)) 최종적으로 P 제어 + 하강 결합 방식을 채택([06](docs/videos/06_precision_landing_P_final.mp4)) |
+| PD 제어 실험 | 미분항을 추가한 버전을 시험했으나 P 제어보다 정렬이 불안정해 채택하지 않음 (아래 비교) |
+
+### 3) P 제어 vs PD 제어
+
+같은 착륙 시험 월드(`f450_landing`)에서 수평 속도 제어기만 바꿔 착륙시킨 결과입니다.
+
+<table>
+<tr>
+<th width="50%">PD 제어 (실험)</th>
+<th width="50%">P 제어 (최종 채택)</th>
+</tr>
+<tr>
+<td><img src="docs/images/precision_landing_pd.gif" width="100%"></td>
+<td><img src="docs/images/precision_landing_p.gif" width="100%"></td>
+</tr>
+<tr>
+<td>하강하는 동안 패드가 화면 중앙에서 벗어나 한쪽으로 치우침. 고도 약 4 m에서도 오프셋이 수십 px 남음</td>
+<td>하강 내내 패드가 화면 중앙에 유지되고, ArUco 4개를 모두 인식한 상태로 착지</td>
+</tr>
+<tr>
+<td><a href="docs/videos/05_precision_landing_PD.mp4">전체 영상 05</a></td>
+<td><a href="docs/videos/06_precision_landing_P_final.mp4">전체 영상 06</a></td>
+</tr>
+</table>
+
+미분항을 넣어도 정렬이 나아지지 않았고, 오히려 패드가 중앙에서 밀려나는 모습을 보였습니다. 그래서 수평 제어는 P 제어로 단순하게 두고, 정렬 오차에 따라 하강 속도를 줄이는 방식(하강·정렬 결합)을 최종 버전으로 채택했습니다.
+
+---
+
+## 실환경 검증
+
+시뮬레이션에서 쓴 인식 로직을 실제 착륙 패드(적색 패드 + 체커보드 + ArUco 4개)와 카메라에 적용해 확인했습니다. 영상은 HSV 임계값과 ArUco 인식 결과를 브라우저로 확인하는 튜너 화면을 녹화한 것입니다.
+
+<table>
+<tr>
+<th width="50%">① 인식 거리 시험 (실내)</th>
+<th width="50%">② 비행 중 하방 카메라 시험 (실외)</th>
+</tr>
+<tr>
+<td><img src="docs/images/real_pad_range_test.gif" width="100%"></td>
+<td><img src="docs/images/real_flight_camera_test.gif" width="100%"></td>
+</tr>
+<tr>
+<td>복도에서 패드를 먼 거리부터 카메라 쪽으로 가져오며 인식 단계를 확인. 원거리에서는 적색 영역만 잡히고, 가까워질수록 ArUco 인식 개수가 늘어 근거리에서 4개가 모두 인식됨</td>
+<td>카메라를 기체에 달고 실제로 비행하며 하방 영상을 확인. 패드가 시야에 들어오자 적색 영역에 이어 ArUco 4개가 인식됨</td>
+</tr>
+<tr>
+<td><a href="docs/videos/07_real_pad_detection_range_test.mp4">전체 영상 07</a></td>
+<td><a href="docs/videos/08_real_flight_camera_test.mp4">전체 영상 08</a></td>
+</tr>
+</table>
+
+원거리 적색 → 근거리 ArUco로 넘어가는 단계적 인식이 실제 카메라에서도 시뮬레이션과 같은 순서로 동작하는 것을 확인했습니다. 실기체 자동 착륙 제어까지는 이 영상에 포함되어 있지 않습니다.
 
 ---
 
@@ -101,7 +154,7 @@ px4_overlay/            # PX4-Autopilot(업스트림) 위에 추가/수정해야
 
 docs/
   images/               # README GIF
-  videos/               # 개발 단계별 시뮬레이션 영상 (01~06)
+  videos/               # 개발 단계별 영상 (01~06 시뮬레이션, 07~08 실환경 검증)
 ```
 
 ### Gazebo 모델·월드
